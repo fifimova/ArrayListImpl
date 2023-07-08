@@ -2,8 +2,8 @@ package org.example.stringlist;
 
 import org.example.exceptions.ElementNotFoundException;
 import org.example.exceptions.IllegalIndexException;
+import org.example.exceptions.ListFullException;
 import org.example.exceptions.NullItemException;
-import org.example.exceptions.StringsFullException;
 
 import java.util.Arrays;
 
@@ -141,7 +141,7 @@ public class StringListImpl implements StringList {
 
     private void validateSize() {
         if (size >= strings.length) {
-            throw new StringsFullException();
+            throw new ListFullException();
         }
     }
 

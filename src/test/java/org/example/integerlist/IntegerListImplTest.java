@@ -130,4 +130,12 @@ class IntegerListImplTest {
         int actualLength = arr.length;
         assertEquals(3, actualLength);
     }
+
+    @Test
+    void shouldExpandList() {
+        for (int i = 0; i < 8; i++) {
+            out.add(5);
+        }
+        assertEquals(11,out.size());
+    }
 }

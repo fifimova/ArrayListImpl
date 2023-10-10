@@ -2,14 +2,13 @@ package org.example.integerlist;
 
 import org.example.exceptions.ElementNotFoundException;
 import org.example.exceptions.IllegalIndexException;
-import org.example.exceptions.ListFullException;
 import org.example.exceptions.NullItemException;
 
 import java.util.Arrays;
 
 public class IntegerListImpl implements IntegerList {
 
-    private final Integer[] integers;
+    private Integer[] integers;
     private int size;
 
     public IntegerListImpl() {
@@ -22,16 +21,15 @@ public class IntegerListImpl implements IntegerList {
 
     @Override
     public Integer add(Integer item) {
-        validateSize();
+        growIfArrayIsFull();
         validateItem(item);
-
         integers[size++] = item;
         return item;
     }
 
     @Override
     public Integer add(int index, Integer item) {
-        validateSize();
+        growIfArrayIsFull();
         validateItem(item);
         validateIndex(index);
         if (index == size) {
@@ -80,7 +78,7 @@ public class IntegerListImpl implements IntegerList {
     @Override
     public boolean contains(Integer item) {
         Integer[] copyIntegers = toArray();
-        sortInsertion(copyIntegers);
+        sort(copyIntegers);
         return binarySearch(copyIntegers, item);
     }
 
@@ -135,17 +133,40 @@ public class IntegerListImpl implements IntegerList {
         return Arrays.copyOf(integers, size);
     }
 
-    private void sortInsertion(Integer[] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            int tmp = arr[i];
-            int j = i;
-            while (j > 0 && arr[j - 1] >= tmp) {
-                arr[j] = arr[j - 1];
-                j--;
-            }
-            arr[j] = tmp;
+    private void sort(Integer[] arr) {
+        quickSort(arr, 0, arr.length - 1);
+    }
+
+    private void quickSort(Integer[] arr, int begin, int end) {
+        if (begin < end) {
+            int partitionIndex = partition(arr, begin, end);
+
+            quickSort(arr, begin, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, end);
         }
     }
+
+    private int partition(Integer[] arr, int begin, int end) {
+        int pivot = arr[end];
+        int i = (begin - 1);
+
+        for (int j = begin; j < end; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+
+                swapElements(arr, i, j);
+            }
+        }
+        swapElements(arr, i + 1, end);
+        return i + 1;
+    }
+
+    private void swapElements(Integer[] arr, int left, int right) {
+        int temp = arr[left];
+        arr[left] = arr[right];
+        arr[right] = temp;
+    }
+
 
     private boolean binarySearch(Integer[] arr, Integer item) {
         int minIdx = 0;
@@ -164,15 +185,20 @@ public class IntegerListImpl implements IntegerList {
         return false;
     }
 
+    private void grow() {
+        integers = Arrays.copyOf(integers, size + size / 2);
+    }
+
+
     private void validateItem(Integer item) {
         if (item == null) {
             throw new NullItemException();
         }
     }
 
-    private void validateSize() {
+    private void growIfArrayIsFull() {
         if (size >= integers.length) {
-            throw new ListFullException();
+            grow();
         }
     }
 
